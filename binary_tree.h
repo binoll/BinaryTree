@@ -29,7 +29,7 @@ public:
     int64_t getSize() const; //Возваращает текущее кол-во объектов
 
 private:
-    Node<type> *root = nullptr;
+    Node<type> const *root = nullptr;
     Node<type> *ptr = nullptr;
     int64_t size = NULL;
 };
@@ -40,7 +40,7 @@ Node<type>::Node(type value) : value(value) {}
 template<typename type>
 BinaryTree<type>::BinaryTree() {
     try {
-        *root = new Node<type>;
+        *root = new Node<type>();
         ptr = root;
     } catch (...) {
         std::cout << "\nConstruct BinaryTree threw except\n";
@@ -50,9 +50,8 @@ BinaryTree<type>::BinaryTree() {
 template<typename type>
 BinaryTree<type>::BinaryTree(type value) {
     try {
-        this->root = new Node<type>;
-        this->root->value = value;
-        ptr = root;
+        this->root = new Node<type>(value);
+        ptr = const_cast<Node<type>*>(root);
         ++size;
     } catch (...) {
         std::cout << "\nConstruct BinaryTree threw except\n";
@@ -71,7 +70,7 @@ bool BinaryTree<type>::add(type value) {
             try {
                 if ((ptr->left == nullptr)) {
                     ptr->left = new Node<type>(value);
-                    ptr = root;
+                    ptr = const_cast<Node<type>*>(root);
                     ++size;
                 }
                 else {
@@ -86,7 +85,7 @@ bool BinaryTree<type>::add(type value) {
             try {
                 if (ptr->right == nullptr) {
                     ptr->right = new Node<type>(value);
-                    ptr = root;
+                    ptr = const_cast<Node<type>*>(root);
                     ++size;
                 }
                 else {

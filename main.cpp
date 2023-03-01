@@ -5,7 +5,12 @@ int main() {
 
     tree.add(30);
 
-    tree.remove();
+    tree.add(5);
+
+    tree.add(20);
+
+    tree.add(40);
+
 
     std::cout << tree.getSize();
 
