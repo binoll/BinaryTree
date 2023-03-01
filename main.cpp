@@ -11,6 +11,8 @@ int main() {
 
     tree.add(40);
 
+    tree.remove(20);
+
 
     std::cout << tree.getSize();
 
