@@ -28,6 +28,7 @@ int main() {
     tree.remove(40);
 
     std::cout << tree.getSize();
+    std::cout << '\n' << tree.find(50) << '\n' << tree.find(40) << '\n' << tree.find(35);
 
     return 0;
 }

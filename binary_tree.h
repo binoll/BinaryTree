@@ -26,6 +26,8 @@ public:
 
     bool remove(type value); //Удаление элемента
 
+    bool find(type value); //Поиск элемента в бинарном дереве поиска
+
     int64_t getSize() const; //Возваращает текущее кол-во объектов
 
 private:
@@ -51,7 +53,7 @@ template<typename type>
 BinaryTree<type>::BinaryTree(type value) {
     try {
         this->root = new Node<type>(value);
-        ptr = const_cast<Node<type>*>(root);
+        ptr = const_cast<Node<type> *>(root);
         ++size;
     } catch (...) {
         std::cout << "\nConstruct BinaryTree threw except\n";
@@ -71,7 +73,7 @@ bool BinaryTree<type>::add(type value) {
                 if ((ptr->left == nullptr)) {
                     ptr->left = new Node<type>(value);
                     ++size;
-                    ptr = const_cast<Node<type>*>(root);
+                    ptr = const_cast<Node<type> *>(root);
                 }
                 else {
                     ptr = ptr->left;
@@ -85,7 +87,7 @@ bool BinaryTree<type>::add(type value) {
             try {
                 if (ptr->right == nullptr) {
                     ptr->right = new Node<type>(value);
-                    ptr = const_cast<Node<type>*>(root);
+                    ptr = const_cast<Node<type> *>(root);
                     ++size;
                 }
                 else {
@@ -103,11 +105,11 @@ bool BinaryTree<type>::add(type value) {
 
 template<typename type>
 bool BinaryTree<type>::remove(type value) {
-   do {
-        if (value < ptr->value) {
+    while (true) {
+        if (ptr->value > value) {
             try {
                 if (ptr->left == nullptr) {
-                    ptr = const_cast<Node<type>*>(root);
+                    ptr = const_cast<Node<type> *>(root);
                     return false;
                 }
                 else if (ptr->left->value == value) {
@@ -115,7 +117,7 @@ bool BinaryTree<type>::remove(type value) {
                         delete ptr->left;
                         ptr->left = nullptr;
                         --size;
-                        ptr = const_cast<Node<type>*>(root);
+                        return true;
                     }
                     else if ((ptr->left->left == nullptr) || (ptr->left->right == nullptr)) {
                         Node<type> *new_ptr = ptr->left;
@@ -124,13 +126,13 @@ bool BinaryTree<type>::remove(type value) {
                             ptr->left = ptr->left->left;
                             delete new_ptr;
                             --size;
-                            ptr = const_cast<Node<type>*>(root);
+                            return true;
                         }
                         else if (ptr->left->right != nullptr) {
                             ptr->left = ptr->left->right;
                             delete new_ptr;
                             --size;
-                            ptr = const_cast<Node<type>*>(root);
+                            return true;
                         }
                     }
                     else if ((ptr->left->left != nullptr) && (ptr->left->right != nullptr)) {
@@ -144,8 +146,7 @@ bool BinaryTree<type>::remove(type value) {
                                 ptr->left->right = nullptr;
                                 ptr->left->value = new_value;
                                 --size;
-                                ptr = const_cast<Node<type>*>(root);
-                                break;
+                                return true;
                             }
                             else {
                                 new_ptr = new_ptr->right;
@@ -161,10 +162,10 @@ bool BinaryTree<type>::remove(type value) {
                 return false;
             }
         }
-        else if (value >= ptr->value) {
+        else {
             try {
                 if (ptr->right == nullptr) {
-                    ptr = const_cast<Node<type>*>(root);
+                    ptr = const_cast<Node<type> *>(root);
                     return false;
                 }
                 else if (ptr->value == value) {
@@ -178,8 +179,7 @@ bool BinaryTree<type>::remove(type value) {
                             new_ptr->left = nullptr;
                             ptr->value = new_value;
                             --size;
-                            ptr = const_cast<Node<type>*>(root);
-                            break;
+                            return true;
                         }
                         else {
                             new_ptr = new_ptr->left;
@@ -191,7 +191,7 @@ bool BinaryTree<type>::remove(type value) {
                         delete ptr->right;
                         ptr->right = nullptr;
                         --size;
-                        ptr = const_cast<Node<type>*>(root);
+                        return true;
                     }
                     else if ((ptr->right->left == nullptr) || (ptr->right->right == nullptr)) {
                         Node<type> *new_ptr = ptr->right;
@@ -200,13 +200,13 @@ bool BinaryTree<type>::remove(type value) {
                             ptr->right = ptr->right->left;
                             delete new_ptr;
                             --size;
-                            ptr = const_cast<Node<type>*>(root);
+                            return true;
                         }
                         else if (ptr->right->right != nullptr) {
                             ptr->right = ptr->right->right;
                             delete new_ptr;
                             --size;
-                            ptr = const_cast<Node<type>*>(root);
+                            return true;
                         }
                     }
                     else if ((ptr->right->left != nullptr) && (ptr->right->right != nullptr)) {
@@ -220,8 +220,7 @@ bool BinaryTree<type>::remove(type value) {
                                 ptr->right->left = nullptr;
                                 ptr->right->value = new_value;
                                 --size;
-                                ptr = const_cast<Node<type>*>(root);
-                                break;
+                                return true;
                             }
                             else {
                                 new_ptr = new_ptr->left;
@@ -237,7 +236,37 @@ bool BinaryTree<type>::remove(type value) {
                 return false;
             }
         }
-    } while (ptr != root);
+    }
+}
+
+template<typename type>
+bool BinaryTree<type>::find(type value) {
+    Node<type> *new_ptr = ptr;
+
+    while (true) {
+        if (new_ptr->value < value) {
+            if (new_ptr->value == value) {
+                return true;
+            }
+            else if (new_ptr->right == nullptr) {
+                return false;
+            }
+            else if (new_ptr->value != value) {
+                new_ptr = new_ptr->right;
+            }
+        }
+        else {
+            if (new_ptr->value == value) {
+                return true;
+            }
+            else if (new_ptr->left == nullptr) {
+                return false;
+            }
+            else if (new_ptr->value != value) {
+                new_ptr = new_ptr->left;
+            }
+        }
+    }
 }
 
 template<typename type>
