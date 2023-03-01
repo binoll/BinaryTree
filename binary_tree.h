@@ -70,8 +70,8 @@ bool BinaryTree<type>::add(type value) {
             try {
                 if ((ptr->left == nullptr)) {
                     ptr->left = new Node<type>(value);
-                    ptr = const_cast<Node<type>*>(root);
                     ++size;
+                    ptr = const_cast<Node<type>*>(root);
                 }
                 else {
                     ptr = ptr->left;
@@ -103,64 +103,54 @@ bool BinaryTree<type>::add(type value) {
 
 template<typename type>
 bool BinaryTree<type>::remove(type value) {
-    do {
+   do {
         if (value < ptr->value) {
             try {
-                if ((ptr->left == nullptr)) {
+                if (ptr->left == nullptr) {
+                    ptr = const_cast<Node<type>*>(root);
                     return false;
                 }
-                else if (value == ptr->left->value) {
+                else if (ptr->left->value == value) {
                     if ((ptr->left->left == nullptr) && (ptr->left->right == nullptr)) {
                         delete ptr->left;
-                        ptr = const_cast<Node<type>*>(root);
+                        ptr->left = nullptr;
                         --size;
+                        ptr = const_cast<Node<type>*>(root);
                     }
-                    else if ((ptr->left->left == nullptr) || (ptr->left->right = nullptr)) {
+                    else if ((ptr->left->left == nullptr) || (ptr->left->right == nullptr)) {
+                        Node<type> *new_ptr = ptr->left;
+
                         if (ptr->left->left != nullptr) {
-                            Node<type> *temp = ptr->left;
                             ptr->left = ptr->left->left;
-                            delete temp;
+                            delete new_ptr;
                             --size;
+                            ptr = const_cast<Node<type>*>(root);
                         }
                         else if (ptr->left->right != nullptr) {
-                            Node<type> *temp = ptr->left;
                             ptr->left = ptr->left->right;
-                            delete temp;
+                            delete new_ptr;
                             --size;
+                            ptr = const_cast<Node<type>*>(root);
                         }
                     }
                     else if ((ptr->left->left != nullptr) && (ptr->left->right != nullptr)) {
                         type new_value = NULL;
-                        Node<type> *new_ptr = root->left;
+                        Node<type> *new_ptr = ptr->left;
 
-                        do {
-                            if (new_ptr->right != nullptr) {
+                        while (true) {
+                            if (new_ptr->right->right == nullptr) {
+                                new_value = new_ptr->right->value;
+                                delete new_ptr->right;
+                                ptr->left->right = nullptr;
+                                ptr->left->value = new_value;
+                                --size;
+                                ptr = const_cast<Node<type>*>(root);
+                                break;
+                            }
+                            else {
                                 new_ptr = new_ptr->right;
                             }
-                            else if ((new_ptr->right == nullptr) && (new_ptr->left == nullptr)) {
-                                new_value = new_ptr->value;
-                                delete new_ptr;
-                                new_ptr = const_cast<Node<type>*>(root);
-                            }
-                            else if ((new_ptr->right != nullptr) || (new_ptr->left != nullptr)) {
-                                if (new_ptr->left->left != nullptr) {
-                                    Node<type> *temp = new_ptr->left;
-                                    new_ptr->left = new_ptr->left->left;
-                                    delete temp;
-                                    --size;
-                                    new_ptr = const_cast<Node<type>*>(root);
-                                }
-                                else if (new_ptr->left->right != nullptr) {
-                                    Node<type> *temp = new_ptr->right;
-                                    new_ptr->left = new_ptr->left->right;
-                                    delete temp;
-                                    --size;
-                                    new_ptr = const_cast<Node<type>*>(root);
-                                }
-                            }
-                        } while (new_ptr != root);
-
-                        ptr->left->value = new_value;
+                        }
                     }
                 }
                 else {
@@ -173,61 +163,70 @@ bool BinaryTree<type>::remove(type value) {
         }
         else if (value >= ptr->value) {
             try {
-                if ((ptr->right == nullptr)) {
+                if (ptr->right == nullptr) {
+                    ptr = const_cast<Node<type>*>(root);
                     return false;
                 }
-                else if (value == ptr->right->value) {
+                else if (ptr->value == value) {
+                    type new_value = NULL;
+                    Node<type> *new_ptr = ptr->right;
+
+                    while (true) {
+                        if (new_ptr->left->left == nullptr) {
+                            new_value = new_ptr->left->value;
+                            delete new_ptr->left;
+                            new_ptr->left = nullptr;
+                            ptr->value = new_value;
+                            --size;
+                            ptr = const_cast<Node<type>*>(root);
+                            break;
+                        }
+                        else {
+                            new_ptr = new_ptr->left;
+                        }
+                    }
+                }
+                else if (ptr->right->value == value) {
                     if ((ptr->right->left == nullptr) && (ptr->right->right == nullptr)) {
                         delete ptr->right;
-                        ptr = const_cast<Node<type>*>(root);
+                        ptr->right = nullptr;
                         --size;
+                        ptr = const_cast<Node<type>*>(root);
                     }
-                    else if ((ptr->right->left == nullptr) || (ptr->right->right = nullptr)) {
+                    else if ((ptr->right->left == nullptr) || (ptr->right->right == nullptr)) {
+                        Node<type> *new_ptr = ptr->right;
+
                         if (ptr->right->left != nullptr) {
-                            Node<type> *temp = ptr->right;
                             ptr->right = ptr->right->left;
-                            delete temp;
+                            delete new_ptr;
                             --size;
+                            ptr = const_cast<Node<type>*>(root);
                         }
                         else if (ptr->right->right != nullptr) {
-                            Node<type> *temp = ptr->right;
                             ptr->right = ptr->right->right;
-                            delete temp;
+                            delete new_ptr;
                             --size;
+                            ptr = const_cast<Node<type>*>(root);
                         }
                     }
                     else if ((ptr->right->left != nullptr) && (ptr->right->right != nullptr)) {
                         type new_value = NULL;
-                        Node<type> *new_ptr = root->right;
+                        Node<type> *new_ptr = ptr->right;
 
-                        do {
-                            if (new_ptr->right != nullptr) {
-                                new_ptr = new_ptr->right;
+                        while (true) {
+                            if (new_ptr->left->left == nullptr) {
+                                new_value = new_ptr->left->value;
+                                delete new_ptr->left;
+                                ptr->right->left = nullptr;
+                                ptr->right->value = new_value;
+                                --size;
+                                ptr = const_cast<Node<type>*>(root);
+                                break;
                             }
-                            else if ((new_ptr->right == nullptr) && (new_ptr->left == nullptr)) {
-                                new_value = new_ptr->value;
-                                delete new_ptr;
-                                new_ptr = const_cast<Node<type>*>(root);
+                            else {
+                                new_ptr = new_ptr->left;
                             }
-                            else if ((new_ptr->right != nullptr) || (new_ptr->left != nullptr)) {
-                                if (new_ptr->left->left != nullptr) {
-                                    Node<type> *temp = new_ptr->right;
-                                    new_ptr->right = new_ptr->right->left;
-                                    delete temp;
-                                    --size;
-                                    new_ptr = const_cast<Node<type>*>(root);
-                                }
-                                else if (new_ptr->right->right != nullptr) {
-                                    Node<type> *temp = new_ptr->right;
-                                    new_ptr->left = new_ptr->left->right;
-                                    delete temp;
-                                    --size;
-                                    new_ptr = const_cast<Node<type>*>(root);
-                                }
-                            }
-                        } while (new_ptr != root);
-
-                        ptr->right->value = new_value;
+                        }
                     }
                 }
                 else {
@@ -237,11 +236,8 @@ bool BinaryTree<type>::remove(type value) {
                 std::cout << "\nMethod 'remove' threw except\n";
                 return false;
             }
-
         }
     } while (ptr != root);
-
-    return true;
 }
 
 template<typename type>
