@@ -28,6 +28,10 @@ public:
 
     bool find(type value); //Поиск элемента в бинарном дереве поиска
 
+    void traversingNRL(); //Обход КПЛ
+
+    void traversingLNR(); //Обход ЛКП
+
     int64_t getSize() const; //Возваращает текущее кол-во объектов
 
 private:
@@ -267,6 +271,36 @@ bool BinaryTree<type>::find(type value) {
             }
         }
     }
+}
+
+template<typename type>
+void BinaryTree<type>::traversingNRL() {
+    Node<type> *ptr_node = const_cast<Node<type>*>(root);
+
+    while (true) {
+        if (ptr_node->right != nullptr) {
+            ptr_node = ptr_node->right;
+            if (ptr_node->left != nullptr) {
+                ptr_node = ptr_node->left;
+            }
+        }
+        else if (ptr_node->left != nullptr) {
+            if (ptr_node->right != nullptr) {
+                ptr_node = ptr_node->right;
+                if (ptr_node->left != nullptr) {
+                    ptr_node = ptr_node->left;
+                }
+            }
+        }
+        if ((ptr_node->right != nullptr) && (ptr_node->left != nullptr)) {
+
+        }
+    }
+}
+
+template<typename type>
+void BinaryTree<type>::traversingLNR() {
+
 }
 
 template<typename type>

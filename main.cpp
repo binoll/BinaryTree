@@ -25,10 +25,10 @@ int main() {
 
     tree.add(50);
 
-    tree.remove(40);
-
     std::cout << tree.getSize();
     std::cout << '\n' << tree.find(50) << '\n' << tree.find(40) << '\n' << tree.find(35);
+
+    tree.traversingNRL();
 
     return 0;
 }
