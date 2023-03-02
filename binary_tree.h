@@ -6,6 +6,12 @@ struct Node {
 
     Node(type value); //Конструктор с параметрами
 
+    bool isNull(); //Пусты ли указатели узла
+
+    bool isRightNull(); //Пуст ли правый указатель
+
+    bool isLeftNull(); //Пуст ли левый указатель
+
     ~Node() = default; //Деструктор
 
     type value = NULL; //Значение
@@ -44,6 +50,36 @@ template<typename type>
 Node<type>::Node(type value) : value(value) {}
 
 template<typename type>
+bool Node<type>::isNull() {
+    if ((right == nullptr) && (left == nullptr)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+template<typename type>
+bool Node<type>::isLeftNull() {
+    if (left == nullptr) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+template<typename type>
+bool Node<type>::isRightNull() {
+    if (right == nullptr) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+template<typename type>
 BinaryTree<type>::BinaryTree() {
     try {
         *root = new Node<type>();
@@ -51,7 +87,7 @@ BinaryTree<type>::BinaryTree() {
     } catch (...) {
         std::cout << "\nConstruct BinaryTree threw except\n";
     }
-};
+}
 
 template<typename type>
 BinaryTree<type>::BinaryTree(type value) {
@@ -76,8 +112,8 @@ bool BinaryTree<type>::add(type value) {
             try {
                 if ((ptr->left == nullptr)) {
                     ptr->left = new Node<type>(value);
-                    ++size;
                     ptr = const_cast<Node<type> *>(root);
+                    ++size;
                 }
                 else {
                     ptr = ptr->left;
@@ -109,139 +145,164 @@ bool BinaryTree<type>::add(type value) {
 
 template<typename type>
 bool BinaryTree<type>::remove(type value) {
-    while (true) {
-        if (ptr->value > value) {
-            try {
-                if (ptr->left == nullptr) {
-                    ptr = const_cast<Node<type> *>(root);
+    if (ptr->value > value) {
+        try {
+            if (ptr->isLeftNull()) {
+                if (ptr->value == value) {
+                    if (ptr == root) {
+                        ptr->value = NULL;
+                    }
+                    return true;
+                }
+                else {
                     return false;
                 }
-                else if (ptr->left->value == value) {
-                    if ((ptr->left->left == nullptr) && (ptr->left->right == nullptr)) {
+            }
+            if ((ptr->left->value == value) || (ptr->value == value)) {
+                if (ptr->left->isNull()) {
+                    delete ptr->left;
+                    ptr->left = nullptr;
+                    --size;
+                    return true;
+                }
+                else if (ptr->left->isLeftNull() || ptr->left->isRightNull()) {
+                    if (!ptr->left->isLeftNull()) {
+                        auto new_ptr = ptr->left;
+                        ptr->left = ptr->left->left;
+                        delete new_ptr;
+                        --size;
+                        return true;
+                    }
+                    else if (!ptr->right->isRightNull()) {
+                        auto new_ptr = ptr->right;
+                        ptr->right = ptr->right->right;
+                        delete new_ptr;
+                        --size;
+                        return true;
+                    }
+                }
+                else if (!ptr->left->isNull()) {
+                    type new_value = NULL;
+                    auto old_ptr = ptr->left;
+                    auto new_ptr = ptr->left->right;
+                    ptr = ptr->left;
+
+                    while (true) {
+                        if (new_ptr->isRightNull()) {
+                            new_value = new_ptr->value;
+                            delete new_ptr;
+                            ptr->right = nullptr;
+                            old_ptr->value = new_value;
+                            --size;
+                            ptr = const_cast<Node<type> *>(root);
+                            return true;
+                        }
+                        else {
+                            ptr = ptr->right;
+                            new_ptr = new_ptr->right;
+                        }
+                    }
+                }
+            }
+            else if (ptr->left->value != value) {
+                ptr = ptr->left;
+                remove(value);
+            }
+        } catch (...) {
+            std::cout << "\nMethod 'remove' threw except\n";
+            return false;
+        }
+    }
+    else {
+        try {
+            if (ptr->value == value) {
+                if (ptr->isNull()) {
+                    if (ptr == root) {
+                        ptr->value = NULL;
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else if (ptr->isLeftNull() || ptr->isRightNull()) {
+                    if (!ptr->isLeftNull()) {
+                        ptr->value = ptr->left->value;
                         delete ptr->left;
                         ptr->left = nullptr;
                         --size;
                         return true;
                     }
-                    else if ((ptr->left->left == nullptr) || (ptr->left->right == nullptr)) {
-                        Node<type> *new_ptr = ptr->left;
-
-                        if (ptr->left->left != nullptr) {
-                            ptr->left = ptr->left->left;
-                            delete new_ptr;
-                            --size;
-                            return true;
-                        }
-                        else if (ptr->left->right != nullptr) {
-                            ptr->left = ptr->left->right;
-                            delete new_ptr;
-                            --size;
-                            return true;
-                        }
-                    }
-                    else if ((ptr->left->left != nullptr) && (ptr->left->right != nullptr)) {
-                        type new_value = NULL;
-                        Node<type> *new_ptr = ptr->left;
-
-                        while (true) {
-                            if (new_ptr->right->right == nullptr) {
-                                new_value = new_ptr->right->value;
-                                delete new_ptr->right;
-                                ptr->left->right = nullptr;
-                                ptr->left->value = new_value;
-                                --size;
-                                return true;
-                            }
-                            else {
-                                new_ptr = new_ptr->right;
-                            }
-                        }
-                    }
-                }
-                else {
-                    ptr = ptr->left;
-                }
-            } catch (...) {
-                std::cout << "\nMethod 'remove' threw except\n";
-                return false;
-            }
-        }
-        else {
-            try {
-                if (ptr->right == nullptr) {
-                    ptr = const_cast<Node<type> *>(root);
-                    return false;
-                }
-                else if (ptr->value == value) {
-                    type new_value = NULL;
-                    Node<type> *new_ptr = ptr->right;
-
-                    while (true) {
-                        if (new_ptr->left->left == nullptr) {
-                            new_value = new_ptr->left->value;
-                            delete new_ptr->left;
-                            new_ptr->left = nullptr;
-                            ptr->value = new_value;
-                            --size;
-                            return true;
-                        }
-                        else {
-                            new_ptr = new_ptr->left;
-                        }
-                    }
-                }
-                else if (ptr->right->value == value) {
-                    if ((ptr->right->left == nullptr) && (ptr->right->right == nullptr)) {
+                    else if (!ptr->isRightNull()) {
+                        ptr->value = ptr->right->value;
                         delete ptr->right;
                         ptr->right = nullptr;
                         --size;
                         return true;
                     }
-                    else if ((ptr->right->left == nullptr) || (ptr->right->right == nullptr)) {
-                        Node<type> *new_ptr = ptr->right;
-
-                        if (ptr->right->left != nullptr) {
-                            ptr->right = ptr->right->left;
-                            delete new_ptr;
-                            --size;
-                            return true;
-                        }
-                        else if (ptr->right->right != nullptr) {
-                            ptr->right = ptr->right->right;
-                            delete new_ptr;
-                            --size;
-                            return true;
-                        }
-                    }
-                    else if ((ptr->right->left != nullptr) && (ptr->right->right != nullptr)) {
-                        type new_value = NULL;
-                        Node<type> *new_ptr = ptr->right;
-
-                        while (true) {
-                            if (new_ptr->left->left == nullptr) {
-                                new_value = new_ptr->left->value;
-                                delete new_ptr->left;
-                                ptr->right->left = nullptr;
-                                ptr->right->value = new_value;
-                                --size;
-                                return true;
-                            }
-                            else {
-                                new_ptr = new_ptr->left;
-                            }
-                        }
-                    }
                 }
-                else {
+                else if (!ptr->isNull()) {
                     ptr = ptr->right;
+                    remove(value);
                 }
-            } catch (...) {
-                std::cout << "\nMethod 'remove' threw except\n";
-                return false;
             }
+            else if (ptr->right->value == value) {
+                if (ptr->right->isNull()) {
+                    delete ptr->right;
+                    ptr->right = nullptr;
+                    --size;
+                    return true;
+                }
+                else if (ptr->right->isLeftNull() || ptr->right->isRightNull()) {
+                    if (!ptr->left->isLeftNull()) {
+                        auto new_ptr = ptr->left;
+                        ptr->left = ptr->left->left;
+                        delete new_ptr;
+                        --size;
+                        return true;
+                    }
+                    else if (!ptr->right->isRightNull()) {
+                        auto new_ptr = ptr->right;
+                        ptr->right = ptr->right->right;
+                        delete new_ptr;
+                        --size;
+                        return true;
+                    }
+                }
+                else if (!ptr->right->isNull()) {
+                    type new_value = NULL;
+                    auto old_ptr = ptr->right;
+                    auto new_ptr = ptr->right->left;
+                    ptr = ptr->right;
+
+                    while (true) {
+                        if (new_ptr == nullptr) {
+                            new_value = new_ptr->value;
+                            delete new_ptr;
+                            ptr->left = nullptr;
+                            old_ptr->value = new_value;
+                            --size;
+                            ptr = const_cast<Node<type> *>(root);
+                            return true;
+                        }
+                        else {
+                            ptr = ptr->left;
+                            new_ptr = new_ptr->left;
+                        }
+                    }
+                }
+            }
+            else if (ptr->right->value != value) {
+                ptr = ptr->right;
+                remove(value);
+            }
+        } catch (...) {
+            std::cout << "\nMethod 'remove' threw except\n";
+            return false;
         }
     }
 }
+
 
 template<typename type>
 bool BinaryTree<type>::find(type value) {
@@ -249,10 +310,7 @@ bool BinaryTree<type>::find(type value) {
 
     while (true) {
         if (new_ptr->value < value) {
-            if (new_ptr->value == value) {
-                return true;
-            }
-            else if (new_ptr->right == nullptr) {
+            if (new_ptr->right == nullptr) {
                 return false;
             }
             else if (new_ptr->value != value) {
@@ -261,6 +319,7 @@ bool BinaryTree<type>::find(type value) {
         }
         else {
             if (new_ptr->value == value) {
+                ptr = new_ptr;
                 return true;
             }
             else if (new_ptr->left == nullptr) {
