@@ -41,6 +41,8 @@ public:
     int64_t getSize() const; //Возваращает текущее кол-во объектов
 
 private:
+    bool removeRecursion(int count, type value, ...);
+    
     Node<type> const *root = nullptr;
     Node<type> *ptr = nullptr;
     int64_t size = NULL;
@@ -107,228 +109,499 @@ BinaryTree<type>::~BinaryTree() {
 
 template<typename type>
 bool BinaryTree<type>::add(type value) {
-    do {
-        if (value < ptr->value) {
-            try {
+    try {
+        while (true) {
+            if (ptr->value > value) {
                 if ((ptr->left == nullptr)) {
                     ptr->left = new Node<type>(value);
                     ptr = const_cast<Node<type> *>(root);
                     ++size;
+                    return true;
                 }
                 else {
                     ptr = ptr->left;
                 }
-            } catch (...) {
-                std::cout << "\nMethod 'add' threw except\n";
-                return false;
             }
-        }
-        else if (value >= ptr->value) {
-            try {
+            else if (ptr->value < value) {
                 if (ptr->right == nullptr) {
                     ptr->right = new Node<type>(value);
                     ptr = const_cast<Node<type> *>(root);
                     ++size;
+                    return true;
                 }
                 else {
                     ptr = ptr->right;
                 }
-            } catch (...) {
-                std::cout << "\nMethod 'add' threw except\n";
+            }
+            else if (ptr->value == value) {
                 return false;
             }
         }
-    } while (ptr != root);
-
-    return true;
+    } catch (...) {
+        ptr = const_cast<Node<type>*>(root);
+        std::cout << "\nMethod 'add' threw except\n";
+        return false;
+    }
 }
 
 template<typename type>
-bool BinaryTree<type>::remove(type value) {
-    if (ptr->value > value) {
-        try {
-            if (ptr->isLeftNull()) {
-                if (ptr->value == value) {
-                    if (ptr == root) {
-                        ptr->value = NULL;
+bool BinaryTree<type>::removeRecursion(int count, type value, ...) {
+    try {
+        if (count == 2) {
+            va_list args;
+            va_start(args, count);
+            ptr = va_arg(args, Node<type>*);
+            va_end(args);
+        }
+        else {
+            ptr = const_cast<Node<type> *>(root);
+        }
+        while (true) {
+            if (ptr->value > value) {
+                if (ptr->left->value == value) {
+                    if (ptr->left->isNull()) {
+                        delete ptr->left;
+                        ptr->left = nullptr;
+                        ptr = const_cast<Node<type> *>(root);
+                        return true;
                     }
-                    return true;
+                    else if (!ptr->left->isLeftNull() && !ptr->left->isRightNull()) {
+                        if (!removeRecursion(2, value, ptr->left)) {
+                            return false;
+                        }
+                        ptr = const_cast<Node<type> *>(root);
+                        return true;
+                    }
+                    else if ((ptr->left->isLeftNull()) || (ptr->left->isRightNull())) {
+                        if (!ptr->left->isLeftNull()) {
+                            type new_value = NULL;
+                            Node<type> *new_ptr = ptr->left->left;
+
+                            while (true) {
+                                if (new_ptr->right == nullptr) {
+                                    new_value = new_ptr->value;
+                                    if (!removeRecursion(1, new_value)) {
+                                        return false;
+                                    }
+                                    ptr->left->value = new_value;
+                                    --size;
+                                    ptr = const_cast<Node<type> *>(root);
+                                    return true;
+                                }
+                                else {
+                                    new_ptr = new_ptr->right;
+                                }
+                            }
+                        }
+                        else if (!ptr->left->isRightNull()) {
+                            type new_value = NULL;
+                            Node<type> *new_ptr = ptr->left->right;
+
+                            while (true) {
+                                if (new_ptr->left == nullptr) {
+                                    new_value = new_ptr->value;
+                                    if (!removeRecursion(1, new_value)) {
+                                        return false;
+                                    }
+                                    ptr->left->value = new_value;
+                                    --size;
+                                    ptr = const_cast<Node<type> *>(root);
+                                    return true;
+                                }
+                                else {
+                                    new_ptr = new_ptr->left;
+                                }
+                            }
+                        }
+                        return true;
+                    }
                 }
                 else {
-                    return false;
+                    ptr = ptr->left;
                 }
             }
-            if ((ptr->left->value == value) || (ptr->value == value)) {
-                if (ptr->left->isNull()) {
-                    delete ptr->left;
-                    ptr->left = nullptr;
-                    --size;
+            else if (ptr->value < value) {
+                if (ptr->right->value == value) {
+                    if (ptr->right->isNull()) {
+                        delete ptr->right;
+                        ptr->right = nullptr;
+                        ptr = const_cast<Node<type> *>(root);
+                        return true;
+                    }
+                    else if (!ptr->right->isRightNull() && !ptr->right->isLeftNull()) {
+                        if (!removeRecursion(2, value, ptr->right)) {
+                            return false;
+                        }
+                        ptr = const_cast<Node<type> *>(root);
+                        return true;
+                    }
+                    else if ((ptr->right->isLeftNull()) || (ptr->right->isRightNull())) {
+                        if (!ptr->right->isLeftNull()) {
+                            type new_value = NULL;
+                            Node<type> *new_ptr = ptr->right->left;
+
+                            while (true) {
+                                if (new_ptr->right == nullptr) {
+                                    new_value = new_ptr->value;
+                                    if (!removeRecursion(1, new_value)) {
+                                        return false;
+                                    }
+                                    ptr->right->value = new_value;
+                                    --size;
+                                    ptr = const_cast<Node<type> *>(root);
+                                    return true;
+                                }
+                                else {
+                                    new_ptr = new_ptr->right;
+                                }
+                            }
+                        }
+                        else if (!ptr->right->isRightNull()) {
+                            type new_value = NULL;
+                            Node<type> *new_ptr = ptr->right->right;
+
+                            while (true) {
+                                if (new_ptr->left == nullptr) {
+                                    new_value = new_ptr->value;
+                                    if (!removeRecursion(1, new_value)) {
+                                        return false;
+                                    }
+                                    ptr->right->value = new_value;
+                                    --size;
+                                    ptr = const_cast<Node<type> *>(root);
+                                    return true;
+                                }
+                                else {
+                                    new_ptr = new_ptr->left;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                }
+                else {
+                    ptr = ptr->right;
+                }
+            }
+            else if (ptr->value == value) {
+                if ((ptr->isNull()) && (ptr == root)) {
+                    ptr->value = NULL;
+                    ptr = const_cast<Node<type> *>(root);
                     return true;
                 }
-                else if (ptr->left->isLeftNull() || ptr->left->isRightNull()) {
-                    if (!ptr->left->isLeftNull()) {
-                        auto new_ptr = ptr->left;
-                        ptr->left = ptr->left->left;
-                        delete new_ptr;
-                        --size;
-                        return true;
-                    }
-                    else if (!ptr->right->isRightNull()) {
-                        auto new_ptr = ptr->right;
-                        ptr->right = ptr->right->right;
-                        delete new_ptr;
-                        --size;
-                        return true;
-                    }
-                }
-                else if (!ptr->left->isNull()) {
+                else if (!ptr->isRightNull() && !ptr->isLeftNull()) {
                     type new_value = NULL;
-                    auto old_ptr = ptr->left;
-                    auto new_ptr = ptr->left->right;
-                    ptr = ptr->left;
+                    Node<type> *new_ptr = ptr->right;
 
                     while (true) {
-                        if (new_ptr->isRightNull()) {
+                        if (new_ptr->left == nullptr) {
                             new_value = new_ptr->value;
-                            delete new_ptr;
-                            ptr->right = nullptr;
-                            old_ptr->value = new_value;
+                            if (!removeRecursion(1, new_value)) {
+                                return false;
+                            }
+                            ptr->value = new_value;
                             --size;
                             ptr = const_cast<Node<type> *>(root);
                             return true;
                         }
                         else {
-                            ptr = ptr->right;
-                            new_ptr = new_ptr->right;
+                            new_ptr = new_ptr->left;
+                        }
+                    }
+                }
+                else if ((ptr->isLeftNull()) || (ptr->isRightNull())) {
+                    if (!ptr->isLeftNull()) {
+                        type new_value = NULL;
+                        Node<type> *new_ptr = ptr->left;
+
+                        while (true) {
+                            if (new_ptr->right == nullptr) {
+                                new_value = new_ptr->value;
+                                if (!removeRecursion(1, new_value)) {
+                                    return false;
+                                }
+                                ptr->value = new_value;
+                                --size;
+                                ptr = const_cast<Node<type> *>(root);
+                                return true;
+                            }
+                            else {
+                                new_ptr = new_ptr->right;
+                            }
+                        }
+                    }
+                    else if (!ptr->isRightNull()) {
+                        type new_value = NULL;
+                        Node<type> *new_ptr = ptr->right;
+
+                        while (true) {
+                            if (new_ptr->left == nullptr) {
+                                new_value = new_ptr->value;
+                                if (!removeRecursion(1, new_value)) {
+                                    return false;
+                                }
+                                ptr->value = new_value;
+                                --size;
+                                ptr = const_cast<Node<type> *>(root);
+                                return true;
+                            }
+                            else {
+                                new_ptr = new_ptr->left;
+                            }
                         }
                     }
                 }
             }
-            else if (ptr->left->value != value) {
-                ptr = ptr->left;
-                remove(value);
+        }
+    } catch (...) {
+        ptr = const_cast<Node<type> *>(root);
+        std::cout << "\nMethod 'remove' threw except\n";
+        return false;
+    }
+}
+
+template<typename type>
+bool BinaryTree<type>::remove(type value) {
+    if (find(value)) {
+        try {
+            if (ptr->value > value) {
+                if (ptr->left->value == value) {
+                    if (ptr->left->isNull()) {
+                        delete ptr->left;
+                        ptr->left = nullptr;
+                        ptr = const_cast<Node<type> *>(root);
+                        return true;
+                    }
+                    else if (!ptr->left->isLeftNull() && !ptr->left->isRightNull()) {
+                        if (removeRecursion(2, value, ptr->left)) {
+                            ptr = const_cast<Node<type> *>(root);
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    else if ((ptr->left->isLeftNull()) || (ptr->left->isRightNull())) {
+                        if (!ptr->left->isLeftNull()) {
+                            type new_value = NULL;
+                            Node<type> *new_ptr = ptr->left->left;
+
+                            while (true) {
+                                if (new_ptr->right == nullptr) {
+                                    new_value = new_ptr->value;
+                                    if (!removeRecursion(1, new_value)) {
+                                        return false;
+                                    }
+                                    ptr->left->value = new_value;
+                                    --size;
+                                    ptr = const_cast<Node<type> *>(root);
+                                    return true;
+                                }
+                                else {
+                                    new_ptr = new_ptr->right;
+                                }
+                            }
+                        }
+                        else if (!ptr->left->isRightNull()) {
+                            type new_value = NULL;
+                            Node<type> *new_ptr = ptr->left->right;
+
+                            while (true) {
+                                if (new_ptr->left == nullptr) {
+                                    new_value = new_ptr->value;
+                                    if (!removeRecursion(1, new_value)) {
+                                        return false;
+                                    }
+                                    ptr->left->value = new_value;
+                                    --size;
+                                    ptr = const_cast<Node<type> *>(root);
+                                    return true;
+                                }
+                                else {
+                                    new_ptr = new_ptr->left;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                }
+            }
+            else if (ptr->value < value) {
+                if (ptr->right->value == value) {
+                    if (ptr->right->isNull()) {
+                        delete ptr->right;
+                        ptr->right = nullptr;
+                        ptr = const_cast<Node<type> *>(root);
+                        return true;
+                    }
+                    else if (!ptr->right->isRightNull() && !ptr->right->isLeftNull()) {
+                        if (removeRecursion(2, value, ptr->right)) {
+                            ptr = const_cast<Node<type> *>(root);
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    else if ((ptr->right->isLeftNull()) || (ptr->right->isRightNull())) {
+                        if (!ptr->right->isLeftNull()) {
+                            type new_value = NULL;
+                            Node<type> *new_ptr = ptr->right->left;
+
+                            while (true) {
+                                if (new_ptr->right == nullptr) {
+                                    new_value = new_ptr->value;
+                                    if (!removeRecursion(1, new_value)) {
+                                        return false;
+                                    }
+                                    ptr->right->value = new_value;
+                                    --size;
+                                    ptr = const_cast<Node<type> *>(root);
+                                    return true;
+                                }
+                                else {
+                                    new_ptr = new_ptr->right;
+                                }
+                            }
+                        }
+                        else if (!ptr->right->isRightNull()) {
+                            type new_value = NULL;
+                            Node<type> *new_ptr = ptr->right->right;
+
+                            while (true) {
+                                if (new_ptr->left == nullptr) {
+                                    new_value = new_ptr->value;
+                                    if (!removeRecursion(1, new_value)) {
+                                        return false;
+                                    }
+                                    ptr->right->value = new_value;
+                                    --size;
+                                    ptr = const_cast<Node<type> *>(root);
+                                    return true;
+                                }
+                                else {
+                                    new_ptr = new_ptr->left;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                }
+                else {
+                    ptr = ptr->right;
+                }
+            }
+            else if (ptr->value == value) {
+                if ((ptr->isNull()) && (ptr == root)) {
+                    ptr->value = NULL;
+                    ptr = const_cast<Node<type> *>(root);
+                    return true;
+                }
+                else if (!ptr->isRightNull() && !ptr->isLeftNull()) {
+                    type new_value = NULL;
+                    Node<type> *new_ptr = ptr->right;
+
+                    while (true) {
+                        if (new_ptr->left == nullptr) {
+                            new_value = new_ptr->value;
+                            if (!removeRecursion(1, new_value)) {
+                                return false;
+                            }
+                            ptr->value = new_value;
+                            --size;
+                            ptr = const_cast<Node<type> *>(root);
+                            return true;
+                        }
+                        else {
+                            new_ptr = new_ptr->left;
+                        }
+                    }
+                }
+                else if ((ptr->isLeftNull()) || (ptr->isRightNull())) {
+                    if (!ptr->isLeftNull()) {
+                        type new_value = NULL;
+                        Node<type> *new_ptr = ptr->left;
+
+                        while (true) {
+                            if (new_ptr->right == nullptr) {
+                                new_value = new_ptr->value;
+                                if (!removeRecursion(1, new_value)) {
+                                    return false;
+                                }
+                                ptr->value = new_value;
+                                --size;
+                                ptr = const_cast<Node<type> *>(root);
+                                return true;
+                            }
+                            else {
+                                new_ptr = new_ptr->right;
+                            }
+                        }
+                    }
+                    else if (!ptr->isRightNull()) {
+                        type new_value = NULL;
+                        Node<type> *new_ptr = ptr->right;
+
+                        while (true) {
+                            if (new_ptr->left == nullptr) {
+                                new_value = new_ptr->value;
+                                if (!removeRecursion(1, new_value)) {
+                                    return false;
+                                }
+                                ptr->value = new_value;
+                                --size;
+                                ptr = const_cast<Node<type> *>(root);
+                                return true;
+                            }
+                            else {
+                                new_ptr = new_ptr->left;
+                            }
+                        }
+                    }
+                }
             }
         } catch (...) {
+            ptr = const_cast<Node<type> *>(root);
             std::cout << "\nMethod 'remove' threw except\n";
             return false;
         }
     }
     else {
-        try {
-            if (ptr->value == value) {
-                if (ptr->isNull()) {
-                    if (ptr == root) {
-                        ptr->value = NULL;
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-                else if (ptr->isLeftNull() || ptr->isRightNull()) {
-                    if (!ptr->isLeftNull()) {
-                        ptr->value = ptr->left->value;
-                        delete ptr->left;
-                        ptr->left = nullptr;
-                        --size;
-                        return true;
-                    }
-                    else if (!ptr->isRightNull()) {
-                        ptr->value = ptr->right->value;
-                        delete ptr->right;
-                        ptr->right = nullptr;
-                        --size;
-                        return true;
-                    }
-                }
-                else if (!ptr->isNull()) {
-                    ptr = ptr->right;
-                    remove(value);
-                }
-            }
-            else if (ptr->right->value == value) {
-                if (ptr->right->isNull()) {
-                    delete ptr->right;
-                    ptr->right = nullptr;
-                    --size;
-                    return true;
-                }
-                else if (ptr->right->isLeftNull() || ptr->right->isRightNull()) {
-                    if (!ptr->left->isLeftNull()) {
-                        auto new_ptr = ptr->left;
-                        ptr->left = ptr->left->left;
-                        delete new_ptr;
-                        --size;
-                        return true;
-                    }
-                    else if (!ptr->right->isRightNull()) {
-                        auto new_ptr = ptr->right;
-                        ptr->right = ptr->right->right;
-                        delete new_ptr;
-                        --size;
-                        return true;
-                    }
-                }
-                else if (!ptr->right->isNull()) {
-                    type new_value = NULL;
-                    auto old_ptr = ptr->right;
-                    auto new_ptr = ptr->right->left;
-                    ptr = ptr->right;
-
-                    while (true) {
-                        if (new_ptr == nullptr) {
-                            new_value = new_ptr->value;
-                            delete new_ptr;
-                            ptr->left = nullptr;
-                            old_ptr->value = new_value;
-                            --size;
-                            ptr = const_cast<Node<type> *>(root);
-                            return true;
-                        }
-                        else {
-                            ptr = ptr->left;
-                            new_ptr = new_ptr->left;
-                        }
-                    }
-                }
-            }
-            else if (ptr->right->value != value) {
-                ptr = ptr->right;
-                remove(value);
-            }
-        } catch (...) {
-            std::cout << "\nMethod 'remove' threw except\n";
-            return false;
-        }
+        return false;
     }
 }
 
-
 template<typename type>
 bool BinaryTree<type>::find(type value) {
-    Node<type> *new_ptr = ptr;
-
-    while (true) {
-        if (new_ptr->value < value) {
-            if (new_ptr->right == nullptr) {
-                return false;
+    try {
+        while (true) {
+            if (ptr->value > value) {
+                if (ptr->left == nullptr) {
+                    ptr = const_cast<Node<type> *>(root);
+                    return false;
+                }
+                else if (ptr->value != value) {
+                    ptr = ptr->left;
+                }
             }
-            else if (new_ptr->value != value) {
-                new_ptr = new_ptr->right;
+            else {
+                if (ptr->value == value) {
+                    ptr = const_cast<Node<type> *>(root);
+                    return true;
+                }
+                if (ptr->right == nullptr) {
+                    ptr = const_cast<Node<type> *>(root);
+                    return false;
+                }
+                else if (ptr->value != value) {
+                    ptr = ptr->right;
+                }
             }
         }
-        else {
-            if (new_ptr->value == value) {
-                ptr = new_ptr;
-                return true;
-            }
-            else if (new_ptr->left == nullptr) {
-                return false;
-            }
-            else if (new_ptr->value != value) {
-                new_ptr = new_ptr->left;
-            }
-        }
+    } catch (...) {
+        ptr = const_cast<Node<type>*>(root);
+        std::cout << "\nMethod 'find' threw except\n";
+        return false;
     }
 }
 
