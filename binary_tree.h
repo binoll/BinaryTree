@@ -1,4 +1,5 @@
 #include "headers.h"
+#include "Cone.h"
 
 template<typename type>
 struct Node {
@@ -106,42 +107,44 @@ BinaryTree<type>::BinaryTree(type value) {
 
 template<typename type>
 BinaryTree<type>::~BinaryTree() {
-    if (!root->isNull()) {
+    if (!root->isRightNull() || !root->isLeftNull()) {
         do {
             remove(root->value);
-        } while (root->value != NULL);
+        } while (!(root->isRightNull() && root->isLeftNull()));
     }
 }
 
 template<typename type>
 bool BinaryTree<type>::add(type value) {
     try {
-        while (true) {
-            if (ptr->value > value) {
-                if ((ptr->left == nullptr)) {
-                    ptr->left = new Node<type>(value);
-                    ptr = root;
-                    ++size;
-                    return true;
+        if (!find(value)) {
+            while (true) {
+                if (ptr->value > value) {
+                    if ((ptr->left == nullptr)) {
+                        ptr->left = new Node<type>(value);
+                        ptr = root;
+                        ++size;
+                        return true;
+                    }
+                    else {
+                        ptr = ptr->left;
+                    }
                 }
-                else {
-                    ptr = ptr->left;
+                else if (ptr->value < value) {
+                    if (ptr->right == nullptr) {
+                        ptr->right = new Node<type>(value);
+                        ptr = root;
+                        ++size;
+                        return true;
+                    }
+                    else {
+                        ptr = ptr->right;
+                    }
                 }
             }
-            else if (ptr->value < value) {
-                if (ptr->right == nullptr) {
-                    ptr->right = new Node<type>(value);
-                    ptr = root;
-                    ++size;
-                    return true;
-                }
-                else {
-                    ptr = ptr->right;
-                }
-            }
-            else if (ptr->value == value) {
-                return false;
-            }
+        }
+        else {
+            return false;
         }
     } catch (...) {
         ptr = root;
@@ -155,10 +158,7 @@ bool BinaryTree<type>::remove(type value) {
     try {
         while (true) {
             if (ptr->value == value) {
-                if ((ptr == root) && (ptr->isNull())) {
-                    ptr->value = NULL;
-                }
-                else if ((ptr->isLeftNull()) || (ptr->isRightNull())) {
+                if ((ptr->isLeftNull()) || (ptr->isRightNull())) {
                     auto new_ptr = ptr;
 
                     if (!ptr->isLeftNull()) {
@@ -178,7 +178,7 @@ bool BinaryTree<type>::remove(type value) {
                 }
                 else if (!ptr->isLeftNull() && !ptr->isRightNull()) {
                     if (!ptr->isLeftNull()) {
-                        type new_value = NULL;
+                        type new_value;
                         auto *new_ptr = ptr->right->left;
                         auto *old_ptr = ptr->right;
 
@@ -197,7 +197,7 @@ bool BinaryTree<type>::remove(type value) {
                         }
                     }
                     else if (!ptr->isRightNull()) {
-                        type new_value = NULL;
+                        type new_value;
                         auto *new_ptr = ptr->left->right;
                         auto *old_ptr = ptr->left;
 
@@ -249,7 +249,7 @@ bool BinaryTree<type>::remove(type value) {
                         }
                     }
                     else if (!ptr->left->isLeftNull() && !ptr->left->isRightNull()) {
-                        type new_value = NULL;
+                        type new_value;
                         auto *new_ptr = ptr->left->right->right;
                         auto *old_ptr = ptr->left->right;
 
@@ -315,7 +315,7 @@ bool BinaryTree<type>::remove(type value) {
                         }
                     }
                     else if (!ptr->right->isLeftNull() && !ptr->right->isRightNull()) {
-                        type new_value = NULL;
+                        type new_value;
                         auto *new_ptr = ptr->right->right->left;
                         auto *old_ptr = ptr->right->right;
 
@@ -534,10 +534,10 @@ bool BinaryTree<type>::isClear() {
 
 template<typename type>
 bool BinaryTree<type>::clear() {
-    if (!root->isNull()) {
+    if (!root->isRightNull() || !root->isLeftNull()) {
         do {
             remove(root->value);
-        } while (root->value != NULL);
+        } while (!(root->isRightNull() && root->isLeftNull()));
     }
     else {
         return false;
