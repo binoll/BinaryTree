@@ -3,19 +3,15 @@
 int main() {
     BinaryTree<int> tree(10);
 
-    tree.add(10);
+    tree.add(30);
 
-    tree.add(15);
+    tree.add(35);
 
-    tree.add(20);
+    tree.add(34);
 
-    tree.add(10);
+    tree.add(40);
 
-    if (tree.remove(10)) {
-        std::cout << "LOX";
-    }
-
-    if (tree.remove(15)) {
+    if (tree.remove(40)) {
         std::cout << "LOX";
     }
 
