@@ -152,7 +152,7 @@ bool BinaryTree<type>::remove(type value) {
                 if ((ptr == root) && (ptr->isNull())) {
                     ptr->value = NULL;
                 }
-                else if ((ptr->isLeftNull()) || (ptr->isLeftNull())) {
+                else if ((ptr->isLeftNull()) || (ptr->isRightNull())) {
                     auto new_ptr = ptr;
 
                     if (!ptr->isLeftNull()) {
@@ -171,7 +171,7 @@ bool BinaryTree<type>::remove(type value) {
                     }
                 }
                 else if (!ptr->isLeftNull() && !ptr->isRightNull()) {
-                    if (!ptr->right->isLeftNull()) {
+                    if (!ptr->isLeftNull()) {
                         type new_value = NULL;
                         auto *new_ptr = ptr->right->left;
                         auto *old_ptr = ptr->right;
@@ -181,7 +181,6 @@ bool BinaryTree<type>::remove(type value) {
                                 new_value = old_ptr->value;
                                 remove(new_value);
                                 ptr->value = new_value;
-                                --size;
                                 ptr = root;
                                 return true;
                             }
@@ -191,7 +190,7 @@ bool BinaryTree<type>::remove(type value) {
                             }
                         }
                     }
-                    else if (!ptr->left->isRightNull()) {
+                    else if (!ptr->isRightNull()) {
                         type new_value = NULL;
                         auto *new_ptr = ptr->left->right;
                         auto *old_ptr = ptr->left;
@@ -201,7 +200,6 @@ bool BinaryTree<type>::remove(type value) {
                                 new_value = new_ptr->value;
                                 remove(value);
                                 ptr->left->value = new_value;
-                                --size;
                                 ptr = root;
                                 return true;
                             }
@@ -293,7 +291,7 @@ bool BinaryTree<type>::remove(type value) {
                         return true;
                     }
                     else if ((ptr->right->isRightNull()) || (ptr->right->isLeftNull())) {
-                        auto *new_ptr = ptr->left;
+                        auto *new_ptr = ptr->right;
 
                         if (!ptr->right->isRightNull()) {
                             ptr->right = ptr->right->right;
@@ -320,7 +318,6 @@ bool BinaryTree<type>::remove(type value) {
                                 new_value = old_ptr->value;
                                 remove(new_value);
                                 ptr->right->value = new_value;
-                                --size;
                                 ptr = root;
                                 return true;
                             }
@@ -328,7 +325,6 @@ bool BinaryTree<type>::remove(type value) {
                                 new_value = new_ptr->value;
                                 remove(new_value);
                                 ptr->right->value = new_value;
-                                --size;
                                 ptr = root;
                                 return true;
                             }
@@ -391,16 +387,26 @@ bool BinaryTree<type>::traversingNRL() {
         std::cout << ptr->value << ' ';
 
         do {
-            ptr = ptr->right;
-            std::cout << ptr->value << ' ';
-            if (traversingNRL()) {
+            if ((!ptr->isRightNull()) && (ptr != nullptr)) {
+                ptr = ptr->right;
+                std::cout << ptr->value << ' ';
+                if (traversingNRL()) {
+                    ptr = root;
+                }
+            }
+            else {
                 ptr = root;
             }
         } while (ptr != root);
         do {
-            ptr = ptr->left;
-            std::cout << ptr->value << ' ';
-            if (traversingNRL()) {
+            if ((!ptr->isLeftNull()) && (ptr != nullptr)) {
+                ptr = ptr->left;
+                std::cout << ptr->value << ' ';
+                if (traversingNRL()) {
+                    ptr = root;
+                }
+            }
+            else {
                 ptr = root;
             }
         } while (ptr != root);
@@ -443,32 +449,49 @@ template<typename type>
 bool BinaryTree<type>::traversingLNR() {
     if (ptr == root) {
         do {
-            ptr = ptr->left;
-            if (traversingLNR()) {
+            if ((!ptr->isLeftNull()) && (ptr != nullptr)) {
+                ptr = ptr->left;
+                if (traversingLNR()) {
+                    ptr = root;
+                    std::cout << ptr->value << ' ';
+                }
+            }
+            else {
                 ptr = root;
-                std::cout << ptr->value << ' ';
             }
         } while (ptr != root);
 
         do {
-            ptr = ptr->right;
-            if (traversingLNR()) {
+            if ((!ptr->isRightNull()) && (ptr != nullptr)) {
+                ptr = ptr->right;
+                if (traversingLNR()) {
+                    ptr = root;
+                }
+            }
+            else {
                 ptr = root;
             }
         } while (ptr != root);
     }
     else {
+        if (ptr == nullptr) {
+            return false;
+        }
         if (!ptr->isRightNull() && !ptr->isLeftNull()) {
             auto ptr_right = ptr->right;
             auto ptr_left = ptr->left;
 
-            std::cout << ptr->value << ' ';
-            ptr = ptr_left;
-            traversingLNR();
-
-            std::cout << ptr->value << ' ';
-            ptr = ptr_right;
-            traversingLNR();
+            if (!ptr->isLeftNull()) {
+                std::cout << ptr->value << ' ';
+                ptr = ptr_left;
+                traversingLNR();
+                std::cout << ptr_right->value << ' ';
+            }
+            else if (!ptr->isRightNull()) {
+                std::cout << ptr->value << ' ';
+                ptr = ptr_right;
+                traversingLNR();
+            }
         }
         else if (!ptr->isLeftNull()) {
             auto ptr_left = ptr->left;
