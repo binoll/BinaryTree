@@ -36,7 +36,7 @@ public:
 
     bool traversingNRL(); //Обход КПЛ
 
-    void traversingLNR(); //Обход ЛКП
+    bool traversingLNR(); //Обход ЛКП
 
     int64_t getSize() const; //Возваращает текущее кол-во объектов
 
@@ -397,7 +397,6 @@ bool BinaryTree<type>::traversingNRL() {
                 ptr = root;
             }
         } while (ptr != root);
-
         do {
             ptr = ptr->left;
             std::cout << ptr->value << ' ';
@@ -435,14 +434,63 @@ bool BinaryTree<type>::traversingNRL() {
             return true;
         }
         else if (ptr->isNull()) {
-            return true;
+            return false;
         }
     }
 }
 
 template<typename type>
-void BinaryTree<type>::traversingLNR() {
+bool BinaryTree<type>::traversingLNR() {
+    if (ptr == root) {
+        do {
+            ptr = ptr->left;
+            if (traversingLNR()) {
+                ptr = root;
+                std::cout << ptr->value << ' ';
+            }
+        } while (ptr != root);
 
+        do {
+            ptr = ptr->right;
+            if (traversingLNR()) {
+                ptr = root;
+            }
+        } while (ptr != root);
+    }
+    else {
+        if (!ptr->isRightNull() && !ptr->isLeftNull()) {
+            auto ptr_right = ptr->right;
+            auto ptr_left = ptr->left;
+
+            std::cout << ptr->value << ' ';
+            ptr = ptr_left;
+            traversingLNR();
+
+            std::cout << ptr->value << ' ';
+            ptr = ptr_right;
+            traversingLNR();
+        }
+        else if (!ptr->isLeftNull()) {
+            auto ptr_left = ptr->left;
+
+            std::cout << ptr->value << ' ';
+            ptr = ptr_left;
+            traversingLNR();
+            return true;
+        }
+        else if (!ptr->isRightNull()) {
+            auto ptr_right = ptr->right;
+
+            std::cout << ptr->value << ' ';
+            ptr = ptr_right;
+            traversingLNR();
+            return true;
+        }
+        else if (ptr->isNull()) {
+            std::cout << ptr->value << ' ';
+            return true;
+        }
+    }
 }
 
 template<typename type>

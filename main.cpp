@@ -23,6 +23,10 @@ int main() {
 
     tree.traversingNRL();
 
+    std::cout << '\n';
+
+    tree.traversingLNR();
+
     std::cout << "\n" << tree.getSize();
     std::cout << '\n' << tree.find(50) << '\n' << tree.find(40) << '\n' << tree.find(15);
 
