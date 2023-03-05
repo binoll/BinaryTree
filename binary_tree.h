@@ -40,6 +40,8 @@ public:
 
     bool isClear(); //Проверка пустоты
 
+    bool clear(); //Очищение дерева
+
     int64_t getSize() const; //Возваращает текущее кол-во объектов
 
 private:
@@ -104,9 +106,11 @@ BinaryTree<type>::BinaryTree(type value) {
 
 template<typename type>
 BinaryTree<type>::~BinaryTree() {
-    do {
-        remove(ptr->value);
-    } while (ptr->value != NULL);
+    if (!root->isNull()) {
+        do {
+            remove(root->value);
+        } while (root->value != NULL);
+    }
 }
 
 template<typename type>
@@ -522,6 +526,18 @@ template<typename type>
 bool BinaryTree<type>::isClear() {
     if (root->isNull()) {
         return true;
+    }
+    else {
+        return false;
+    }
+}
+
+template<typename type>
+bool BinaryTree<type>::clear() {
+    if (!root->isNull()) {
+        do {
+            remove(root->value);
+        } while (root->value != NULL);
     }
     else {
         return false;

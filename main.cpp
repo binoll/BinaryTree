@@ -23,13 +23,18 @@ int main() {
 
     tree.traversingNRL();
 
-    std::cout << '\n' << tree;
+    std::cout << '\n' << tree.isClear() << '\n' << tree;
 
     std::cout << '\n';
 
     tree.traversingLNR();
 
+    tree.clear();
+
+    std::cout << '\n' << tree.isClear();
+
     std::cout << "\n" << tree.getSize();
+
     std::cout << '\n' << tree.find(50) << '\n' << tree.find(40) << '\n' << tree.find(15);
 
     return 0;
