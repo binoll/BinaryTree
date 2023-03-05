@@ -21,11 +21,9 @@ int main() {
 
     tree.add(14);
 
-    if (tree.remove(10)) {
-        std::cout << "LOX";
-    }
+    tree.traversingNRL();
 
-    std::cout << tree.getSize();
+    std::cout << "\n" << tree.getSize();
     std::cout << '\n' << tree.find(50) << '\n' << tree.find(40) << '\n' << tree.find(15);
 
 

@@ -34,11 +34,13 @@ public:
 
     bool find(type value); //Поиск элемента в бинарном дереве поиска
 
-    void traversingNRL(); //Обход КПЛ
+    bool traversingNRL(); //Обход КПЛ
 
     void traversingLNR(); //Обход ЛКП
 
     int64_t getSize() const; //Возваращает текущее кол-во объектов
+
+    friend std::ostream& operator<<(std::ostream& stream, const BinaryTree<type> &tree);
 
 private:
     Node<type> *root = nullptr;
@@ -136,7 +138,7 @@ bool BinaryTree<type>::add(type value) {
             }
         }
     } catch (...) {
-        ptr = const_cast<Node<type>*>(root);
+        ptr = root;
         std::cout << "\nMethod 'add' threw except\n";
         return false;
     }
@@ -377,33 +379,63 @@ bool BinaryTree<type>::find(type value) {
             }
         }
     } catch (...) {
-        ptr = const_cast<Node<type>*>(root);
+        ptr = root;
         std::cout << "\nMethod 'find' threw except\n";
         return false;
     }
 }
 
 template<typename type>
-void BinaryTree<type>::traversingNRL() {
-    Node<type> *ptr_node = const_cast<Node<type>*>(root);
+bool BinaryTree<type>::traversingNRL() {
+    if (ptr == root) {
+        std::cout << ptr->value << ' ';
 
-    while (true) {
-        if (ptr_node->right != nullptr) {
-            ptr_node = ptr_node->right;
-            if (ptr_node->left != nullptr) {
-                ptr_node = ptr_node->left;
+        do {
+            ptr = ptr->right;
+            std::cout << ptr->value << ' ';
+            if (traversingNRL()) {
+                ptr = root;
             }
-        }
-        else if (ptr_node->left != nullptr) {
-            if (ptr_node->right != nullptr) {
-                ptr_node = ptr_node->right;
-                if (ptr_node->left != nullptr) {
-                    ptr_node = ptr_node->left;
-                }
-            }
-        }
-        if ((ptr_node->right != nullptr) && (ptr_node->left != nullptr)) {
+        } while (ptr != root);
 
+        do {
+            ptr = ptr->left;
+            std::cout << ptr->value << ' ';
+            if (traversingNRL()) {
+                ptr = root;
+            }
+        } while (ptr != root);
+    }
+    else {
+        if (!ptr->isRightNull() && !ptr->isLeftNull()) {
+            auto ptr_right = ptr->right;
+            auto ptr_left = ptr->left;
+
+            ptr = ptr_right;
+            std::cout << ptr->value << ' ';
+            traversingNRL();
+            ptr = ptr_left;
+            std::cout << ptr->value << ' ';
+            traversingNRL();
+        }
+        else if (!ptr->isRightNull()) {
+            auto ptr_right = ptr->right;
+
+            ptr = ptr_right;
+            std::cout << ptr->value << ' ';
+            traversingNRL();
+            return true;
+        }
+        else if (!ptr->isLeftNull()) {
+            auto ptr_left = ptr->left;
+
+            ptr = ptr_left;
+            std::cout << ptr->value << ' ';
+            traversingNRL();
+            return true;
+        }
+        else if (ptr->isNull()) {
+            return true;
         }
     }
 }
@@ -416,4 +448,9 @@ void BinaryTree<type>::traversingLNR() {
 template<typename type>
 int64_t BinaryTree<type>::getSize() const {
     return size;
+}
+
+template<typename type>
+std::ostream& operator<<(std::ostream& stream, const BinaryTree<type> &tree) {
+
 }
