@@ -38,9 +38,9 @@ public:
 
     bool traversingLNR(); //Обход ЛКП
 
-    int64_t getSize() const; //Возваращает текущее кол-во объектов
+    bool isClear(); //Проверка пустоты
 
-    friend std::ostream& operator<<(std::ostream& stream, const BinaryTree<type> &tree);
+    int64_t getSize() const; //Возваращает текущее кол-во объектов
 
 private:
     Node<type> *root = nullptr;
@@ -104,7 +104,9 @@ BinaryTree<type>::BinaryTree(type value) {
 
 template<typename type>
 BinaryTree<type>::~BinaryTree() {
-
+    do {
+        remove(ptr->value);
+    } while (ptr->value != NULL);
 }
 
 template<typename type>
@@ -517,11 +519,22 @@ bool BinaryTree<type>::traversingLNR() {
 }
 
 template<typename type>
+bool BinaryTree<type>::isClear() {
+    if (root->isNull()) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+template<typename type>
 int64_t BinaryTree<type>::getSize() const {
     return size;
 }
 
 template<typename type>
-std::ostream& operator<<(std::ostream& stream, const BinaryTree<type> &tree) {
-
+std::ostream& operator<<(std::ostream& stream, BinaryTree<type> &tree) {
+    tree.traversingNRL();
+    return stream;
 }
