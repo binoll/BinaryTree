@@ -175,11 +175,10 @@ bool BinaryTree<type>::remove(type value) {
                         auto *old_ptr = ptr->right;
 
                         while (true) {
-                            if (new_ptr != nullptr) {
-                                new_value = new_ptr->value;
-                                delete old_ptr->left;
-                                old_ptr->left = nullptr;
-                                ptr->right->value = new_value;
+                            if (new_ptr == nullptr) {
+                                new_value = old_ptr->value;
+                                remove(new_value);
+                                ptr->value = new_value;
                                 --size;
                                 ptr = root;
                                 return true;
@@ -198,8 +197,7 @@ bool BinaryTree<type>::remove(type value) {
                         while (true) {
                             if (new_ptr != nullptr) {
                                 new_value = new_ptr->value;
-                                delete old_ptr->left;
-                                old_ptr->left = nullptr;
+                                remove(value);
                                 ptr->left->value = new_value;
                                 --size;
                                 ptr = root;
@@ -226,7 +224,7 @@ bool BinaryTree<type>::remove(type value) {
                         ptr = root;
                         return true;
                     }
-                    else if ((ptr->left->isLeftNull()) || (ptr->left->isLeftNull())) {
+                    else if ((ptr->left->isLeftNull()) || (ptr->left->isRightNull())) {
                         auto *new_ptr = ptr->left;
 
                         if (!ptr->left->isLeftNull()) {
@@ -292,7 +290,7 @@ bool BinaryTree<type>::remove(type value) {
                         ptr = root;
                         return true;
                     }
-                    else if ((ptr->right->isLeftNull()) || (ptr->right->isLeftNull())) {
+                    else if ((ptr->right->isRightNull()) || (ptr->right->isLeftNull())) {
                         auto *new_ptr = ptr->left;
 
                         if (!ptr->right->isRightNull()) {
@@ -318,8 +316,7 @@ bool BinaryTree<type>::remove(type value) {
                         while (true) {
                             if (new_ptr == nullptr) {
                                 new_value = old_ptr->value;
-                                delete old_ptr;
-                                ptr->right->right = nullptr;
+                                remove(new_value);
                                 ptr->right->value = new_value;
                                 --size;
                                 ptr = root;
@@ -327,8 +324,7 @@ bool BinaryTree<type>::remove(type value) {
                             }
                             else if (new_ptr->isLeftNull()) {
                                 new_value = new_ptr->value;
-                                delete new_ptr->left;
-                                old_ptr->left = nullptr;
+                                remove(new_value);
                                 ptr->right->value = new_value;
                                 --size;
                                 ptr = root;
