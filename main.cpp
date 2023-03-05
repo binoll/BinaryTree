@@ -15,8 +15,6 @@ int main() {
 
     tree.add(15);
 
-
-
     tree.add(12);
 
     tree.add(17);
