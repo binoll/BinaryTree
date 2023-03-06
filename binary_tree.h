@@ -483,16 +483,15 @@ bool BinaryTree<type>::traversingLNR() {
             return false;
         }
         if (!ptr->isRightNull() && !ptr->isLeftNull()) {
-            auto ptr_right = ptr->right;
-            auto ptr_left = ptr->left;
+            auto new_ptr = ptr;
 
-            std::cout << ptr->value << ' ';
-            ptr = ptr_left;
+            ptr = new_ptr->left;
             traversingLNR();
-            ptr = ptr_right;
+            ptr = new_ptr->right;
+            std::cout << new_ptr->value << ' ';
             traversingLNR();
-}
-        else if (!ptr->isLeftNull()) {
+        }
+        else if (!ptr->isLeftNull() && ptr->isRightNull()) {
             auto ptr_left = ptr->left;
 
             std::cout << ptr->value << ' ';
@@ -500,7 +499,7 @@ bool BinaryTree<type>::traversingLNR() {
             traversingLNR();
             return true;
         }
-        else if (!ptr->isRightNull()) {
+        else if (!ptr->isRightNull() && ptr->isLeftNull()) {
             auto ptr_right = ptr->right;
 
             std::cout << ptr->value << ' ';
@@ -508,7 +507,6 @@ bool BinaryTree<type>::traversingLNR() {
             traversingLNR();
             return true;
         }
-
         else if (ptr->isNull()) {
             std::cout << ptr->value << ' ';
             return true;

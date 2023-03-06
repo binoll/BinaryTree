@@ -4,15 +4,16 @@ int main() {
     BinaryTree<int> tree(10);
 
     tree.add(4);
+    tree.add(1);
     tree.add(9);
     tree.add(21);
     tree.add(25);
     tree.add(15);
     tree.add(12);
-    tree.add(11);
     tree.add(17);
     tree.add(16);
     tree.add(18);
+    tree.add(20);
 
     tree.traversingLNR();
     std::cout << '\n';
