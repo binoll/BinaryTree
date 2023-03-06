@@ -1,6 +1,24 @@
 #include "binary_tree.h"
 
 int main() {
+    BinaryTree<int> tree(10);
+
+    tree.add(4);
+    tree.add(9);
+    tree.add(21);
+    tree.add(25);
+    tree.add(15);
+    tree.add(12);
+    tree.add(11);
+    tree.add(17);
+    tree.add(16);
+    tree.add(18);
+
+    tree.traversingLNR();
+    std::cout << '\n';
+    tree.traversingNRL();
+    std::cout << '\n';
+
     int rd1 = 20, rd2 = 50, rd3 = 800, rd4 = 20, rd5 = 100;
     int ru1 = 2, ru2 = 50, ru3 = 80, ru4 = 2, ru5 = 10;
     int h1 = 5, h2 = 11, h3 = 10, h4 = 5, h5 = 40;

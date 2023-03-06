@@ -37,7 +37,7 @@ TEST(TestBinaryTree, TestFind) {
 
 TEST(TestBinaryTree, TestClear) {
     tree.clear();
-    ASSERT_EQ(1, tree.getSize());
+    ASSERT_EQ(0, tree.getSize());
 };
 
 TEST(TestCone, TestAdd) {
@@ -52,4 +52,9 @@ TEST(TestCone, TestRemove) {
 
 TEST(TestCone, TestFind) {
     ASSERT_TRUE(tree_cone.find(cone4));
+};
+
+TEST(TestCone, TestClear) {
+    tree_cone.clear();
+    ASSERT_EQ(0, tree_cone.getSize());
 };
