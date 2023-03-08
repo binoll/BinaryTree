@@ -1,49 +1,50 @@
 #include "headers.h"
 #include "Cone.h"
+#pragma once
 
 template<typename type>
 struct Node {
-    Node() = default; //Конструктор без параметров
+    Node() = default;  // Конструктор без параметров
 
-    Node(type value); //Конструктор с параметрами
+    Node(type value);  // Конструктор с параметрами
 
-    bool isNull(); //Пусты ли указатели узла
+    bool isNull();  // Пусты ли указатели узла
 
-    bool isRightNull(); //Пуст ли правый указатель
+    bool isRightNull();  // Пуст ли правый указатель
 
-    bool isLeftNull(); //Пуст ли левый указатель
+    bool isLeftNull();  // Пуст ли левый указатель
 
-    ~Node() = default; //Деструктор
+    ~Node() = default;  // Деструктор
 
-    type value = NULL; //Значение
-    Node<type> *left = nullptr; //Указатель на левый узел
-    Node<type> *right = nullptr; //Указатель на правый узел
+    type value = NULL; // Значение
+    Node<type> *left = nullptr;  // Указатель на левый узел
+    Node<type> *right = nullptr;  // Указатель на правый узел
 };
 
 template<typename type>
 class BinaryTree {
 public:
-    BinaryTree(); //Конструктор без параметров
+    BinaryTree();  // Конструктор без параметров
 
-    BinaryTree(type value); //Конструктор с параметрами
+    BinaryTree(type value);  // Конструктор с параметрами
 
-    ~BinaryTree(); //Деструктор
+    ~BinaryTree();  // Деструктор
 
-    bool add(type value); //Добавление элемента
+    bool add(type value);  // Добавление элемента
 
-    bool remove(type value); //Удаление элемента
+    bool remove(type value);  // Удаление элемента
 
-    bool find(type value); //Поиск элемента в бинарном дереве поиска
+    bool find(type value);  // Поиск элемента в бинарном дереве поиска
 
-    bool traversingNRL(); //Обход КПЛ
+    bool traversingNRL();  // Обход КПЛ
 
-    bool traversingLNR(); //Обход ЛКП
+    bool traversingLNR();  // Обход ЛКП
 
-    bool isClear(); //Проверка пустоты
+    bool isClear();  // Проверка пустоты
 
-    bool clear(); //Очищение дерева
+    bool clear();  // Очищение дерева
 
-    int64_t getSize() const; //Возваращает текущее кол-во объектов
+    int64_t getSize() const;  // Возваращает текущее кол-во объектов
 
 private:
     Node<type> *root = nullptr;
