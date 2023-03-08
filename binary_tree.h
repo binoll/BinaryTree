@@ -492,11 +492,12 @@ bool BinaryTree<type>::traversingLNR() {
             traversingLNR();
         }
         else if (!ptr->isLeftNull() && ptr->isRightNull()) {
+            auto new_ptr = ptr;
             auto ptr_left = ptr->left;
 
-            std::cout << ptr->value << ' ';
             ptr = ptr_left;
             traversingLNR();
+            std::cout << new_ptr->value << ' ';
             return true;
         }
         else if (!ptr->isRightNull() && ptr->isLeftNull()) {
